@@ -1,7 +1,7 @@
 use {
     crate::{
         log::{create_trace_layer, tracing_init},
-        routes::{health, index, static_files},
+        routes::{calendar, health, index, static_files},
     },
     axum::{routing::get, Router},
     color_eyre::eyre::Result,
@@ -22,6 +22,8 @@ pub use crate::config::Config;
 /// Static files cached time in seconds
 const STATIC_FILES_MAX_AGE: u64 = 3600;
 
+const CALENDAR_MAX_AGE: u64 = 300;
+
 /// Starts a new instance of the contractor returning a handle
 pub async fn start(config: &Config) -> Result<Handle> {
     // initialize global tracing subscriber
@@ -40,8 +42,9 @@ pub async fn start(config: &Config) -> Result<Handle> {
 
     // create router with all routes and tracing layer
     let router = Router::new()
-        .route("/health", get(health))
         .route("/", get(index))
+        .route("/health", get(health))
+        .route("/calendar", get(calendar))
         .fallback(static_files)
         .with_state(pool)
         .layer(compression)
