@@ -1,7 +1,7 @@
 use {
     crate::{error::Error, CALENDAR_MAX_AGE},
     axum::{
-        extract::State,
+        extract::{Path, State},
         http::{
             header::{CACHE_CONTROL, CONTENT_TYPE},
             HeaderMap, HeaderValue,
@@ -14,9 +14,17 @@ use {
         Event, ICalendar,
     },
     sqlx::{Pool, Postgres},
+    std::collections::HashSet,
 };
 
-pub async fn calendar(State(_): State<Pool<Postgres>>) -> Result<impl IntoResponse, Error> {
+pub async fn calendar(
+    State(_): State<Pool<Postgres>>,
+    Path(groups): Path<String>,
+) -> Result<impl IntoResponse, Error> {
+    dbg!(groups.split('+').collect::<HashSet<_>>());
+
+    // for each group, pull all it's events from db, put into ical and return
+
     let mut body = vec![];
 
     let mut calendar = ICalendar::new("2.0", "ics-rs");

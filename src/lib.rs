@@ -32,7 +32,7 @@ pub async fn start(config: &Config) -> Result<Handle> {
     config::init(config.clone()).await;
 
     let pool = PgPoolOptions::new()
-        .acquire_timeout(Duration::from_secs(2))
+        .acquire_timeout(Duration::from_secs(5))
         .connect(&config.database_url)
         .await?;
 
@@ -44,7 +44,7 @@ pub async fn start(config: &Config) -> Result<Handle> {
     let router = Router::new()
         .route("/", get(index))
         .route("/health", get(health))
-        .route("/calendar", get(calendar))
+        .route("/calendar/:groups", get(calendar))
         .fallback(static_files)
         .with_state(pool)
         .layer(compression)
