@@ -2,14 +2,14 @@ use {
     crate::{error::Error, models::DbEvent, validate_group, CALENDAR_MAX_AGE},
     axum::{
         extract::{Path, State},
-        http::{
-            header::{CACHE_CONTROL, CONTENT_TYPE},
-            HeaderMap, HeaderValue,
-        },
+        headers::{CacheControl, ContentType},
         response::IntoResponse,
+        TypedHeader,
     },
     ics::ICalendar,
+    mime_guess::mime::Mime,
     sqlx::{Pool, Postgres},
+    std::str::FromStr,
 };
 
 pub async fn calendar(
@@ -43,12 +43,15 @@ pub async fn calendar(
         body
     };
 
-    let mut headers = HeaderMap::new();
-    headers.insert(CONTENT_TYPE, HeaderValue::from_static("calendar/text"));
-    headers.insert(
-        CACHE_CONTROL,
-        HeaderValue::from_str(&format!("public, max-age={CALENDAR_MAX_AGE}, immutable")).unwrap(),
-    );
-
-    Ok((headers, body))
+    Ok((
+        TypedHeader(ContentType::from(
+            Mime::from_str("text/calendar").expect("Failed to parse text/calendar MIME type"),
+        )),
+        TypedHeader(
+            CacheControl::new()
+                .with_max_age(CALENDAR_MAX_AGE)
+                .with_public(),
+        ),
+        body,
+    ))
 }

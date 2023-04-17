@@ -6,8 +6,10 @@ use {
         models::{DbEvent, EventResponse, NewEvent},
     },
     axum::{
-        extract::{Json, Path, State},
-        response::IntoResponse,
+        extract::{Path, State},
+        headers::CacheControl,
+        response::{IntoResponse, Json},
+        TypedHeader,
     },
     sqlx::{Pool, Postgres},
 };
@@ -21,7 +23,10 @@ pub async fn get_events(State(db): State<Pool<Postgres>>) -> Result<impl IntoRes
         .map(Into::into)
         .collect::<Vec<EventResponse>>();
 
-    Ok(Json(events))
+    Ok((
+        TypedHeader(CacheControl::new().with_no_cache()),
+        Json(events),
+    ))
 }
 
 /// Auth required

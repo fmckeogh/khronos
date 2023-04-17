@@ -29,11 +29,11 @@ pub mod routes;
 
 pub use crate::config::Config;
 
-/// Static files cached time in seconds
-const STATIC_FILES_MAX_AGE: u64 = 300;
+/// Static files cached time
+const STATIC_FILES_MAX_AGE: Duration = Duration::from_secs(300);
 
 /// Cache time for calendar requests
-const CALENDAR_MAX_AGE: u64 = 60;
+const CALENDAR_MAX_AGE: Duration = Duration::from_secs(30);
 
 /// Starts a new instance of the contractor returning a handle
 pub async fn start(config: &Config) -> Result<Handle> {
