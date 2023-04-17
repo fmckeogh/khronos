@@ -9,7 +9,7 @@ use {
     std::{net::SocketAddr, time::Duration},
     tokio::task::JoinHandle,
     tower_http::compression::CompressionLayer,
-    tracing::info,
+    tracing::{debug, info},
 };
 
 pub mod config;
@@ -22,6 +22,7 @@ pub use crate::config::Config;
 /// Static files cached time in seconds
 const STATIC_FILES_MAX_AGE: u64 = 3600;
 
+/// Cache time for calendar requests
 const CALENDAR_MAX_AGE: u64 = 300;
 
 /// Starts a new instance of the contractor returning a handle
@@ -36,6 +37,7 @@ pub async fn start(config: &Config) -> Result<Handle> {
         .connect(&config.database_url)
         .await?;
 
+    debug!("running migrations");
     sqlx::migrate!().run(&pool).await?;
 
     let compression = CompressionLayer::new().br(true).deflate(true).gzip(true);
@@ -59,7 +61,7 @@ pub async fn start(config: &Config) -> Result<Handle> {
     // spawn server on new tokio task
     let handle = tokio::spawn(async { server.await.map_err(Into::into) });
 
-    info!("contractor started on http://{}", address);
+    info!("khronos started on http://{}", address);
 
     // return handles
     Ok(Handle { address, handle })
