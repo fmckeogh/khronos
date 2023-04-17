@@ -13,7 +13,7 @@ axum = "0.6.15"
 tokio = { version = "1.27.0", features = ["full"] }
 tower-http = { version = "0.4.0", features = ["trace", "compression-br", "compression-gzip", "compression-deflate"] }
 
-sqlx = { version = "0.6.3", features = ["runtime-tokio-rustls", "postgres", "chrono", "offline"] }
+sqlx = { version = "0.6.3", features = ["runtime-tokio-rustls", "postgres", "chrono", "offline", "uuid"] }
 
 config = "0.13.3"
 dotenv = "0.15.0"

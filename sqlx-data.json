@@ -1,40 +1,124 @@
 {
   "db": "PostgreSQL",
-  "9dd5ae343237f1870b77e9a3a71bd0e16b52905222bb39b31b9da2e7a8235c9b": {
+  "0d4d698b039ac95743392f44379bd1b8881297a06d0e0d333b065aec5d9da24e": {
     "describe": {
       "columns": [
         {
-          "name": "name",
+          "name": "id",
           "ordinal": 0,
-          "type_info": "Text"
+          "type_info": "Uuid"
         },
         {
-          "name": "email",
+          "name": "name",
           "ordinal": 1,
           "type_info": "Text"
         },
         {
-          "name": "description",
+          "name": "email",
           "ordinal": 2,
           "type_info": "Text"
         },
         {
-          "name": "group",
+          "name": "description",
           "ordinal": 3,
           "type_info": "Text"
         },
         {
-          "name": "start",
+          "name": "group",
           "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "start",
+          "ordinal": 5,
           "type_info": "Timestamptz"
         },
         {
           "name": "end",
-          "ordinal": 5,
+          "ordinal": 6,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT * FROM events"
+  },
+  "4db8b6ee0e8371a044d288d549319aa6acdfda2a8c0777e53bc817a27e84aa25": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "INSERT INTO groups VALUES ($1)"
+  },
+  "5a783b89cd64ce66d20eb74cd110a2bfeeacae172e08eed6f6d228492d834298": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "DELETE FROM groups WHERE name=$1"
+  },
+  "9dd5ae343237f1870b77e9a3a71bd0e16b52905222bb39b31b9da2e7a8235c9b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "group",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "start",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "end",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
         false,
         false,
         false,
@@ -49,5 +133,23 @@
       }
     },
     "query": "SELECT * FROM events WHERE \"group\" = ANY($1)"
+  },
+  "edcb1d8e096ca4e7fa84b546c244a0f19f6db3befb235a225531b62eb59ad68f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "name",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT * FROM groups"
   }
 }

@@ -1,10 +1,19 @@
 use {
     crate::{
+        error::Error,
         log::{create_trace_layer, tracing_init},
-        routes::{calendar, health, index, static_files},
+        routes::{
+            add_event, add_group, calendar, delete_event, delete_group, get_events, get_groups,
+            health, index, static_files, update_event,
+        },
     },
-    axum::{routing::get, Router},
+    axum::{
+        routing::{get, put},
+        Router,
+    },
     color_eyre::eyre::Result,
+    once_cell::sync::Lazy,
+    regex::Regex,
     sqlx::postgres::PgPoolOptions,
     std::{net::SocketAddr, time::Duration},
     tokio::task::JoinHandle,
@@ -15,6 +24,7 @@ use {
 pub mod config;
 pub mod error;
 pub mod log;
+pub mod models;
 pub mod routes;
 
 pub use crate::config::Config;
@@ -45,6 +55,10 @@ pub async fn start(config: &Config) -> Result<Handle> {
         .route("/", get(index))
         .route("/health", get(health))
         .route("/calendar/:groups", get(calendar))
+        .route("/groups", get(get_groups))
+        .route("/groups/:name", put(add_group).delete(delete_group))
+        .route("/events", get(get_events).post(add_event))
+        .route("/events/:id", put(update_event).delete(delete_event))
         .fallback(static_files)
         .with_state(pool)
         .with_state(config.clone())
@@ -85,4 +99,15 @@ impl Handle {
         self.handle.await??;
         Ok(())
     }
+}
+
+pub fn validate_group(name: &str) -> Result<&str, Error> {
+    /// Group name validator
+    static GROUP_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new("^[0-9a-z]+$").unwrap());
+
+    if !GROUP_REGEX.is_match(name) {
+        return Err(Error::InvalidGroupFormat(name.to_owned()));
+    }
+
+    Ok(name)
 }

@@ -1,5 +1,5 @@
 use {
-    crate::{error::Error, CALENDAR_MAX_AGE},
+    crate::{error::Error, models::DbEvent, validate_group, CALENDAR_MAX_AGE},
     axum::{
         extract::{Path, State},
         http::{
@@ -8,19 +8,9 @@ use {
         },
         response::IntoResponse,
     },
-    chrono::{DateTime, Utc},
-    ics::{
-        escape_text,
-        properties::{Categories, Description, DtEnd, DtStart, Organizer, Summary},
-        Event, ICalendar,
-    },
-    once_cell::sync::Lazy,
-    regex::Regex,
+    ics::ICalendar,
     sqlx::{Pool, Postgres},
-    uuid::Uuid,
 };
-
-static GROUP_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new("^[0-9a-z]+$").unwrap());
 
 pub async fn calendar(
     State(db): State<Pool<Postgres>>,
@@ -29,10 +19,7 @@ pub async fn calendar(
     // retrieve requested event groups from path
     let groups = groups
         .split('+')
-        .map(|s| match GROUP_REGEX.is_match(s) {
-            true => Ok(s.to_owned()),
-            false => Err(Error::InvalidGroupFormat(groups.clone())),
-        })
+        .map(|g| validate_group(g).map(ToOwned::to_owned))
         .collect::<Result<Vec<_>, Error>>()?;
 
     // for each group, pull all it's events from db, put into ical and return
@@ -44,14 +31,17 @@ pub async fn calendar(
     .fetch_all(&db)
     .await?;
 
-    let mut calendar = ICalendar::new("2.0", "khronos");
+    let body = {
+        let mut calendar = ICalendar::new("2.0", "khronos");
 
-    events
-        .iter()
-        .for_each(|event| calendar.add_event(event.into()));
+        events
+            .iter()
+            .for_each(|event| calendar.add_event(event.into()));
 
-    let mut body = vec![];
-    calendar.write(&mut body).unwrap();
+        let mut body = vec![];
+        calendar.write(&mut body).unwrap();
+        body
+    };
 
     let mut headers = HeaderMap::new();
     headers.insert(CONTENT_TYPE, HeaderValue::from_static("calendar/text"));
@@ -61,45 +51,4 @@ pub async fn calendar(
     );
 
     Ok((headers, body))
-}
-
-#[derive(Debug)]
-struct DbEvent {
-    name: String,
-    email: String,
-    description: String,
-    group: String,
-    start: DateTime<Utc>,
-    end: DateTime<Utc>,
-}
-
-impl<'a> From<&'a DbEvent> for Event<'a> {
-    fn from(
-        DbEvent {
-            name,
-            email,
-            description,
-            group,
-            start,
-            end,
-        }: &'a DbEvent,
-    ) -> Self {
-        let mut event = Event::new(
-            Uuid::new_v4().as_hyphenated().to_string(),
-            format_datetime(start),
-        );
-
-        event.push(Summary::new(name));
-        event.push(Description::new(escape_text(description)));
-        event.push(Organizer::new(format!("mailto:{email}")));
-        event.push(DtStart::new(format_datetime(start)));
-        event.push(DtEnd::new(format_datetime(end)));
-        event.push(Categories::new(group));
-
-        event
-    }
-}
-
-fn format_datetime(datetime: &DateTime<Utc>) -> String {
-    datetime.format("%Y%m%dT%H%M%SZ").to_string()
 }
