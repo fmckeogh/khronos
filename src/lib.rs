@@ -20,17 +20,15 @@ pub mod routes;
 pub use crate::config::Config;
 
 /// Static files cached time in seconds
-const STATIC_FILES_MAX_AGE: u64 = 3600;
+const STATIC_FILES_MAX_AGE: u64 = 300;
 
 /// Cache time for calendar requests
-const CALENDAR_MAX_AGE: u64 = 300;
+const CALENDAR_MAX_AGE: u64 = 60;
 
 /// Starts a new instance of the contractor returning a handle
 pub async fn start(config: &Config) -> Result<Handle> {
     // initialize global tracing subscriber
     tracing_init()?;
-
-    config::init(config.clone()).await;
 
     let pool = PgPoolOptions::new()
         .acquire_timeout(Duration::from_secs(5))
@@ -49,11 +47,12 @@ pub async fn start(config: &Config) -> Result<Handle> {
         .route("/calendar/:groups", get(calendar))
         .fallback(static_files)
         .with_state(pool)
+        .with_state(config.clone())
         .layer(compression)
         .layer(create_trace_layer());
 
     // bind axum server to socket address and use router to create a service factory
-    let server = axum::Server::bind(&config::get().address).serve(router.into_make_service());
+    let server = axum::Server::bind(&config.address).serve(router.into_make_service());
 
     // get address server is bound to (may be different to address passed to Server::bind)
     let address = server.local_addr();

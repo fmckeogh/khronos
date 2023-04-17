@@ -1,6 +1,6 @@
 [package]
 name = "khronos"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
 
 [profile.release]
@@ -10,27 +10,26 @@ codegen-units = 1
 
 [dependencies]
 axum = "0.6.15"
-color-eyre = "0.6.2"
+tokio = { version = "1.27.0", features = ["full"] }
+tower-http = { version = "0.4.0", features = ["trace", "compression-br", "compression-gzip", "compression-deflate"] }
+
+sqlx = { version = "0.6.3", features = ["runtime-tokio-rustls", "postgres", "chrono", "offline"] }
+
 config = "0.13.3"
 dotenv = "0.15.0"
-serde = { version = "1.0.160", features = ["derive"] }
-tokio = { version = "1.27.0", features = ["full"] }
+
+color-eyre = "0.6.2"
 tracing = { version = "0.1.37" }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
-tower-http = { version = "0.4.0", features = ["trace", "compression-br", "compression-gzip", "compression-deflate"] }
+
 displaydoc = "0.2.3"
 thiserror = "1.0.40"
-parking_lot = "0.12.1"
-reqwest = { version = "0.11.16", default-features = false, features = ["rustls-tls"] }
-futures = "0.3.28"
+
+once_cell = { version = "1.17.1", features = ["parking_lot"] }
+serde = { version = "1.0.160", features = ["derive"] }
 regex = "1.7.3"
-async-once-cell = "0.4.4"
 include_dir = "0.7.3"
 mime_guess = "2.0.4"
 chrono = "0.4.24"
-crc = "3.0.1"
-sqlx = { version = "0.6.3", features = [ "runtime-tokio-rustls", "postgres", "chrono", "offline"] }
-itertools = "0.10.5"
 ics = "0.5.8"
-once_cell = "1.17.1"
 uuid = { version = "1.3.1", features = ["v4"] }
