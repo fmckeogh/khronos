@@ -1,5 +1,7 @@
 use {
-    crate::{error::Error, models::DbGroup, validate_group, CALENDAR_MAX_AGE},
+    crate::{
+        auth::AdminAuth, error::Error, models::DbGroup, validate_group, AppState, CALENDAR_MAX_AGE,
+    },
     axum::{
         extract::{Path, State},
         headers::CacheControl,
@@ -7,10 +9,12 @@ use {
         response::{IntoResponse, Json},
         TypedHeader,
     },
-    sqlx::{Pool, Postgres},
 };
 
-pub async fn get_groups(State(db): State<Pool<Postgres>>) -> Result<impl IntoResponse, Error> {
+/// Get all groups
+pub async fn get_groups(
+    State(AppState { db, .. }): State<AppState>,
+) -> Result<impl IntoResponse, Error> {
     let groups = sqlx::query_as!(DbGroup, "SELECT * FROM groups")
         .fetch_all(&db)
         .await?;
@@ -25,9 +29,10 @@ pub async fn get_groups(State(db): State<Pool<Postgres>>) -> Result<impl IntoRes
     ))
 }
 
-/// requires auth
+/// Add a new group
 pub async fn add_group(
-    State(db): State<Pool<Postgres>>,
+    _: AdminAuth,
+    State(AppState { db, .. }): State<AppState>,
     Path(name): Path<String>,
 ) -> Result<impl IntoResponse, Error> {
     validate_group(&name)?;
@@ -39,9 +44,10 @@ pub async fn add_group(
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// requires auth
+/// Delete a group
 pub async fn delete_group(
-    State(db): State<Pool<Postgres>>,
+    _: AdminAuth,
+    State(AppState { db, .. }): State<AppState>,
     Path(name): Path<String>,
 ) -> Result<impl IntoResponse, Error> {
     validate_group(&name)?;

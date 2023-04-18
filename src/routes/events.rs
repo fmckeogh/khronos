@@ -2,8 +2,10 @@
 
 use {
     crate::{
+        auth::{AdminAuth, UserAuth},
         error::Error,
         models::{DbEvent, EventResponse, NewEvent},
+        AppState,
     },
     axum::{
         extract::{Path, State},
@@ -11,11 +13,13 @@ use {
         response::{IntoResponse, Json},
         TypedHeader,
     },
-    sqlx::{Pool, Postgres},
 };
 
-/// Auth required
-pub async fn get_events(State(db): State<Pool<Postgres>>) -> Result<impl IntoResponse, Error> {
+/// Get all events
+pub async fn get_events(
+    _: AdminAuth,
+    State(AppState { db, .. }): State<AppState>,
+) -> Result<impl IntoResponse, Error> {
     let events = sqlx::query_as!(DbEvent, "SELECT * FROM events")
         .fetch_all(&db)
         .await?
@@ -29,26 +33,29 @@ pub async fn get_events(State(db): State<Pool<Postgres>>) -> Result<impl IntoRes
     ))
 }
 
-/// Auth required
+/// Add a new event
 pub async fn add_event(
-    State(_db): State<Pool<Postgres>>,
+    _: UserAuth,
+    State(AppState { .. }): State<AppState>,
     Json(_event): Json<NewEvent>,
 ) -> Result<impl IntoResponse, Error> {
     Ok(())
 }
 
-/// Auth required post Event (no id), get DbEvent in response
+/// Update existing event
 pub async fn update_event(
-    State(_db): State<Pool<Postgres>>,
+    _: UserAuth,
+    State(AppState { .. }): State<AppState>,
     Path(_event_id): Path<String>,
     Json(_event): Json<NewEvent>,
 ) -> Result<impl IntoResponse, Error> {
     Ok(())
 }
 
-/// Auth required
+/// Delete an event
 pub async fn delete_event(
-    State(_db): State<Pool<Postgres>>,
+    _: AdminAuth,
+    State(AppState { .. }): State<AppState>,
     Path(_event_id): Path<String>,
 ) -> Result<impl IntoResponse, Error> {
     Ok(())

@@ -15,6 +15,8 @@ pub struct Config {
 
     /// Database URL
     pub database_url: String,
+
+    pub jwt_secret: String,
 }
 
 impl Config {

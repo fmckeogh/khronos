@@ -1,5 +1,5 @@
 use {
-    crate::{error::Error, models::DbEvent, validate_group, CALENDAR_MAX_AGE},
+    crate::{error::Error, models::DbEvent, validate_group, AppState, CALENDAR_MAX_AGE},
     axum::{
         extract::{Path, State},
         headers::{CacheControl, ContentType},
@@ -8,12 +8,11 @@ use {
     },
     ics::ICalendar,
     mime_guess::mime::Mime,
-    sqlx::{Pool, Postgres},
     std::str::FromStr,
 };
 
 pub async fn calendar(
-    State(db): State<Pool<Postgres>>,
+    State(AppState { db, .. }): State<AppState>,
     Path(groups): Path<String>,
 ) -> Result<impl IntoResponse, Error> {
     // retrieve requested event groups from path
