@@ -1,30 +1,79 @@
 <!DOCTYPE html>
 <html>
-    <header>
-        <meta charset=utf-8>
-        <title>Event Calendar</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Calendar</title>
 
-        <link href=https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css rel=stylesheet>
-        <script src=/main.js type=module></script>
-    </header>
-    <body>
-        <div class=p-5>
-            <h1 class="display-1 text-center">Modules and Events Calendar</h2>
-            <h4 class=text-center>Automatically sync coursework deadlines, exams, and society events with your calendar</h3>
+    <!-- bootstrap -->
+    <link
+    href=https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha3/css/bootstrap.min.css
+    rel=stylesheet>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha3/js/bootstrap.min.js"
+      integrity="sha512-wOLiP6uL5tNrV1FiutKtAyQGGJ1CWAsqQ6Kp2XZ12/CvZxw8MvNJfdhh0yTwjPIir4SWag2/MHrseR7PRmNtvA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script src="main.js"></script>
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="p-5">
+      <h1 class="display-1 text-center">Modules and Events Calendar</h1>
+      <h3 class="text-center text-muted">
+        Automatically sync coursework deadlines, exams, and society events with
+        your calendar
+      </h3>
+    </div>
+
+    <!-- buttons -->
+    <h5 class="mx-3 mb-2">
+      Step 1. Select the kinds of events you want to see
+    </h5>
+    <div class="container text-center">
+      <div class="row">
+        <!-- modules -->
+        <div class="col-sm">
+          <h5><u>Modules</u></h5>
+          <div id="modules"></div>
         </div>
-        <div>
-            <button type="button" class="btn btn-primary">Download</button>
+
+        <!-- societies -->
+        <div class="col-sm">
+          <h5><u>Societies</u></h5>
+          <div id="societies"></div>
         </div>
-        <div>
-            how to use
+
+        <!-- schools -->
+        <div class="col-sm">
+          <h5><u>Schools</u></h5>
+          <div id="schools"></div>
         </div>
-        <footer class="bg-light text-center text-lg-start">
-            <div class="text-center p-3">
-                <h5>
-                    For feedback or issues please email
-                    <a href=mailto:ferdia@eventcal.uk>ferdia@eventcal.uk</a>
-                </h5>
-            </div>
-        </footer>
-    </body>
+      </div>
+    </div>
+
+    <!-- webcal link -->
+    <h5 class="mx-3 mb-2">
+      Step 2. Click the link to subscribe your calendar to the events
+    </h5>
+    <div class="text-center p-3">
+      <kbd class="p-3"><a id="link" href=""></a></kbd>
+    </div>
+
+    <!-- faq/help -->
+    <!-- <h5 class="mx-3 mb-2">
+      If this does not work, you may need to manually add the link.
+    </h5> -->
+
+    <footer class="bg-light text-center text-lg-start">
+      <div class="text-center p-3">
+        <h5>
+          For feedback or issues please email
+          <a href="mailto:ferdia@eventcal.uk">ferdia@eventcal.uk</a>
+        </h5>
+      </div>
+    </footer>
+  </body>
 </html>
