@@ -1,3 +1,6 @@
+/// s4202, wics, and cs enabled by default
+var selectedGroups = new Set(["cs4202", "wics", "cs"]);
+
 window.onload = async (_event) => {
   fetch("/groups")
     .then((response) => {
@@ -7,20 +10,44 @@ window.onload = async (_event) => {
       for (const group of groups) {
         addButton(group);
       }
-
-      setLink("webcal://eventcal.uk/calendar/cs+wics+stacs+cs4202");
+      setDefaultButtonStates();
+      updateLink();
     });
 };
 
+/// We want cs4202, wics, and cs enabled by default to demonstrate to the user how it works
+function setDefaultButtonStates() {
+  selectedGroups.forEach((value) =>
+    bootstrap.Button.getOrCreateInstance(
+      document.getElementById(value)
+    ).toggle()
+  );
+}
+
+/// Adds a new button corresponding to an event group to the page
 function addButton(group) {
   let button = document.createElement("button");
   button.type = "button";
   button.classList.add("btn");
   button.classList.add("btn-outline-primary");
   button.classList.add("m-2");
-  button.textContent = group;
   button.setAttribute("data-bs-toggle", "button");
+  button.id = group;
+  button.textContent = group;
+  button.onclick = buttonClick;
   document.getElementById(getGroupId(group)).appendChild(button);
+}
+
+/// If a button is clicked, update selectedGroups and the displayed
+function buttonClick(evt) {
+  let button = evt.target;
+  if (button.classList.contains("active")) {
+    selectedGroups.add(button.id);
+  } else {
+    selectedGroups.delete(button.id);
+  }
+
+  updateLink();
 }
 
 /// Gets the ID of the meta group of an event group
@@ -38,12 +65,20 @@ function getGroupId(group) {
   }
 }
 
-/// Sets the value of the webcal link being displayed
-function setLink(contents) {
+/// Updates the value of the webcal link being displayed
+function updateLink() {
+  let contents = "webcal://eventcal.uk/calendar/";
+  let base_length = contents.length;
+
+  selectedGroups.forEach((group) => {
+    if (contents.length != base_length) {
+      contents += "+";
+    }
+
+    contents += group;
+  });
+
   let link = document.getElementById("link");
   link.innerText = contents;
   link.setAttribute("href", contents);
 }
-
-/// We want cs4202, wics, and cs enabled by default to demonstrate to the user how it works
-function setDefaultButtonStates() {}
