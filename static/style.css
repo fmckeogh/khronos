@@ -1,3 +1,8 @@
 #link {
     color: #FFFFFF;
 }
+
+.btn:not(.active):hover {
+    color: var(--bs-btn-color);
+    background: var(--bs-btn-active-color);
+}
