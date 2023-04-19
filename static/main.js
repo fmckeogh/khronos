@@ -1,6 +1,3 @@
-/// s4202, wics, and cs enabled by default
-var selectedGroups = new Set(["cs4202", "wics", "cs"]);
-
 window.onload = async (_event) => {
   fetch("/groups")
     .then((response) => {
@@ -11,13 +8,13 @@ window.onload = async (_event) => {
         addButton(group);
       }
       setDefaultButtonStates();
-      updateLink();
+      updateSelectedGroups();
     });
 };
 
 /// We want cs4202, wics, and cs enabled by default to demonstrate to the user how it works
 function setDefaultButtonStates() {
-  selectedGroups.forEach((value) =>
+  ["cs", "wics", "cs4202"].forEach((value) =>
     bootstrap.Button.getOrCreateInstance(
       document.getElementById(value)
     ).toggle()
@@ -34,20 +31,22 @@ function addButton(group) {
   button.setAttribute("data-bs-toggle", "button");
   button.id = group;
   button.textContent = group;
-  button.onclick = buttonClick;
+  button.onclick = updateSelectedGroups;
   document.getElementById(getGroupId(group)).appendChild(button);
 }
 
 /// If a button is clicked, update selectedGroups and the displayed
-function buttonClick(evt) {
-  let button = evt.target;
-  if (button.classList.contains("active")) {
-    selectedGroups.add(button.id);
-  } else {
-    selectedGroups.delete(button.id);
+function updateSelectedGroups() {
+  let selectedGroups = [];
+
+  var buttons = document.getElementsByClassName("btn");
+  for (var i = 0; i < buttons.length; i++) {
+    if (buttons[i].classList.contains("active")) {
+      selectedGroups.push(buttons[i].id);
+    }
   }
 
-  updateLink();
+  setLinkGroups(selectedGroups);
 }
 
 /// Gets the ID of the meta group of an event group
@@ -66,7 +65,7 @@ function getGroupId(group) {
 }
 
 /// Updates the value of the webcal link being displayed
-function updateLink() {
+function setLinkGroups(selectedGroups) {
   let contents = "webcal://eventcal.uk/calendar/";
   let base_length = contents.length;
 
