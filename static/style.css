@@ -1,5 +1,6 @@
 #link {
-    color: #FFFFFF;
+    color: #ffffff;
+    background: #363636;
 }
 
 .btn:not(.active):hover {
