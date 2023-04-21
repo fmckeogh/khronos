@@ -36,9 +36,6 @@ pub use crate::config::Config;
 /// Static files cached time
 const STATIC_FILES_MAX_AGE: Duration = Duration::from_secs(300);
 
-/// Cache time for calendar requests
-const CALENDAR_MAX_AGE: Duration = Duration::from_secs(30);
-
 #[derive(Clone)]
 pub struct AppState {
     db: Pool<Postgres>,

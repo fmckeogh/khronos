@@ -1,5 +1,5 @@
 use {
-    crate::{error::Error, models::DbEvent, validate_group, AppState, CALENDAR_MAX_AGE},
+    crate::{error::Error, models::DbEvent, validate_group, AppState},
     axum::{
         extract::{Path, State},
         headers::{CacheControl, ContentType},
@@ -46,11 +46,7 @@ pub async fn calendar(
         TypedHeader(ContentType::from(
             Mime::from_str("text/calendar").expect("Failed to parse text/calendar MIME type"),
         )),
-        TypedHeader(
-            CacheControl::new()
-                .with_max_age(CALENDAR_MAX_AGE)
-                .with_public(),
-        ),
+        TypedHeader(CacheControl::new().with_no_cache()),
         body,
     ))
 }

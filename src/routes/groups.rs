@@ -1,7 +1,5 @@
 use {
-    crate::{
-        auth::AdminAuth, error::Error, models::DbGroup, validate_group, AppState, CALENDAR_MAX_AGE,
-    },
+    crate::{auth::AdminAuth, error::Error, models::DbGroup, validate_group, AppState},
     axum::{
         extract::{Path, State},
         headers::CacheControl,
@@ -20,11 +18,7 @@ pub async fn get_groups(
         .await?;
 
     Ok((
-        TypedHeader(
-            CacheControl::new()
-                .with_max_age(CALENDAR_MAX_AGE)
-                .with_public(),
-        ),
+        TypedHeader(CacheControl::new().with_no_cache()),
         Json(groups.into_iter().map(|g| g.name).collect::<Vec<_>>()),
     ))
 }
