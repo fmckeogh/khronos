@@ -35,7 +35,7 @@ pub async fn add_group(
         .execute(&db)
         .await?;
 
-    Ok(StatusCode::NO_CONTENT)
+    Ok(StatusCode::CREATED)
 }
 
 /// Delete a group
