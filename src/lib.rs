@@ -15,9 +15,13 @@ use {
     jsonwebtoken::DecodingKey,
     once_cell::sync::Lazy,
     regex::Regex,
-    sqlx::postgres::{PgPoolOptions, Postgres},
+    sqlx::{
+        postgres::{PgPoolOptions, Postgres},
+        Pool,
+    },
     std::{net::SocketAddr, time::Duration},
     tokio::task::JoinHandle,
+    tower::ServiceBuilder,
     tower_http::compression::CompressionLayer,
     tracing::{debug, info},
 };
@@ -28,8 +32,6 @@ pub mod error;
 pub mod log;
 pub mod models;
 pub mod routes;
-
-use sqlx::Pool;
 
 pub use crate::config::Config;
 
@@ -73,8 +75,13 @@ pub async fn start(config: &Config) -> Result<Handle> {
         .layer(CompressionLayer::new().br(true).deflate(true).gzip(true))
         .layer(create_trace_layer());
 
+    let service = ServiceBuilder::new()
+        .load_shed()
+        .concurrency_limit(2048)
+        .service(router.into_make_service());
+
     // bind axum server to socket address and use router to create a service factory
-    let server = axum::Server::bind(&config.address).serve(router.into_make_service());
+    let server = axum::Server::bind(&config.address).serve(service);
 
     // get address server is bound to (may be different to address passed to Server::bind)
     let address = server.local_addr();
