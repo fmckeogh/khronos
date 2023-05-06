@@ -22,7 +22,5 @@ RUN touch src/main.rs
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
 FROM scratch
-ENV ADDRESS=
-ENV DATABASE_URL=
 COPY --from=builder /workdir/target/x86_64-unknown-linux-musl/release/khronos .
 ENTRYPOINT ["./khronos"]

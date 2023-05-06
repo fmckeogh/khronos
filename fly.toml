@@ -1,40 +1,41 @@
-# fly.toml file generated for khronos on 2023-04-14T15:32:04+01:00
+# fly.toml app configuration file generated for khronos on 2023-05-06T10:17:16+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = "khronos"
-kill_signal = "SIGINT"
-kill_timeout = 5
 primary_region = "lhr"
-processes = []
-
-[env]
-  ADDRESS = "0.0.0.0:8080"
-  RUST_LOG = "info,sqlx=warn,tower_http::trace::on_request=warn"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
 
 [experimental]
   auto_rollback = true
 
+[env]
+  ADDRESS = "0.0.0.0:8080"
+  PRIMARY_REGION = "lhr"
+  RUST_LOG = "info,sqlx=warn,tower_http::trace::on_request=warn"
+
 [[services]]
-  http_checks = []
+  protocol = "tcp"
   internal_port = 8080
   processes = ["app"]
-  protocol = "tcp"
-  script_checks = []
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
   [services.concurrency]
+    type = "connections"
     hard_limit = 25
     soft_limit = 20
-    type = "connections"
-
-  [[services.ports]]
-    force_https = true
-    handlers = ["http"]
-    port = 80
-
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
 
   [[services.tcp_checks]]
-    grace_period = "1s"
-    interval = "15s"
-    restart_limit = 0
+    interval = "60s"
     timeout = "2s"
+    grace_period = "1s"
+    restart_limit = 0
