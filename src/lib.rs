@@ -36,7 +36,7 @@ pub mod routes;
 pub use crate::config::Config;
 
 /// Static files cached time
-const STATIC_FILES_MAX_AGE: Duration = Duration::from_secs(300);
+const STATIC_FILES_MAX_AGE: Duration = Duration::from_secs(60);
 
 #[derive(Clone)]
 pub struct AppState {

@@ -1,6 +1,7 @@
-#link {
+#linkbox {
     color: #ffffff;
     background: #363636;
+    line-height: 200%;
 }
 
 .btn:not(.active):hover {

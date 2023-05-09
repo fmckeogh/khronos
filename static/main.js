@@ -78,6 +78,6 @@ function setLinkGroups(selectedGroups) {
   });
 
   let link = document.getElementById("link");
-  link.innerText = contents;
+  link.innerText = contents.replace("+", "+\u200b");
   link.setAttribute("href", contents);
 }
