@@ -15,6 +15,7 @@ use {
     jsonwebtoken::DecodingKey,
     once_cell::sync::Lazy,
     regex::Regex,
+    sentry::ClientInitGuard,
     sqlx::{
         postgres::{PgPoolOptions, Postgres},
         Pool,
@@ -48,6 +49,14 @@ pub struct AppState {
 pub async fn start(config: &Config) -> Result<Handle> {
     // initialize global tracing subscriber
     tracing_init()?;
+
+    let guard = sentry::init((
+        config.sentry_url.as_str(),
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            ..Default::default()
+        },
+    ));
 
     let pool = PgPoolOptions::new()
         .acquire_timeout(Duration::from_secs(5))
@@ -92,7 +101,11 @@ pub async fn start(config: &Config) -> Result<Handle> {
     info!("khronos started on http://{}", address);
 
     // return handles
-    Ok(Handle { address, handle })
+    Ok(Handle {
+        address,
+        handle,
+        guard,
+    })
 }
 
 /// Handle for running an instance
@@ -101,6 +114,8 @@ pub struct Handle {
     address: SocketAddr,
     // JoinHandle for server task
     handle: JoinHandle<Result<()>>,
+    // Sentry guard
+    guard: ClientInitGuard,
 }
 
 impl Handle {

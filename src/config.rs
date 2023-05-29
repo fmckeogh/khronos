@@ -17,6 +17,9 @@ pub struct Config {
     pub database_url: String,
 
     pub jwt_secret: String,
+
+    /// Sentry ingest URL
+    pub sentry_url: String,
 }
 
 impl Config {
