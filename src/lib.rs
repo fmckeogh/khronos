@@ -60,6 +60,7 @@ pub async fn start(config: &Config) -> Result<Handle> {
 
     let pool = PgPoolOptions::new()
         .acquire_timeout(Duration::from_secs(5))
+        .min_connections(5)
         .connect(&config.database_url)
         .await?;
 
@@ -104,7 +105,7 @@ pub async fn start(config: &Config) -> Result<Handle> {
     Ok(Handle {
         address,
         handle,
-        guard,
+        _guard: guard,
     })
 }
 
@@ -115,7 +116,7 @@ pub struct Handle {
     // JoinHandle for server task
     handle: JoinHandle<Result<()>>,
     // Sentry guard
-    guard: ClientInitGuard,
+    _guard: ClientInitGuard,
 }
 
 impl Handle {
